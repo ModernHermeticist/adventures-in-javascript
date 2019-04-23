@@ -16,14 +16,15 @@ function heuristic(a, b)
     return d;
 }
 
-var rows = 15;
-var cols = 15;
+var rows = 25;
+var cols = 25;
 var grid = new Array(cols);
 
 var openSet = [];
 var closedSet = [];
 var start;
 var end;
+var noSolution = false;
 
 var w, h;
 
@@ -38,10 +39,20 @@ function Spot(i, j)
     this.h = 0;
     this.neighbors = [];
     this.previous = undefined;
+    this.wall = false;
+
+    if (random(1) < 0.4)
+    {
+        this.wall = true;
+    }
 
     this.show = function(col)
     {
         fill(col);
+        if (this.wall)
+        {
+            fill(0);
+        }
         noStroke();
         rect(this.i * w, this.j * h, w-1, h-1);
     }
@@ -58,6 +69,14 @@ function Spot(i, j)
             this.neighbors.push(grid[i][j + 1]);
         if (j > 0)
             this.neighbors.push(grid[i][j - 1]);
+        if (i > 0 && j > 0)
+            this.neighbors.push(grid[i-1][j-1]);
+        if (i < cols-1 && j > 0)
+            this.neighbors.push(grid[i+1][j-1]);
+        if (i > 0 && j < rows-1)
+            this.neighbors.push(grid[i-1][j+1]);
+        if (i < cols-1 && j < rows-1)
+            this.neighbors.push(grid[i+1][j+1]);
     }
 }
 
@@ -92,6 +111,9 @@ function setup()
 
     start = grid[0][0];
     end = grid[cols-1][rows-1];
+    // This is purely for testing
+    start.wall = false;
+    end.wall = false;
 
     openSet.push(start);
 
@@ -127,7 +149,7 @@ function draw()
         {
             var neighbor = neighbors[i];
 
-            if(!closedSet.includes(neighbor))
+            if(!closedSet.includes(neighbor) && !neighbor.wall)
             {
                 var tG = current.g + 1;
                 if (openSet.includes(neighbor))
@@ -148,6 +170,9 @@ function draw()
     }
     else
     {
+        console.log("No solution!");
+        noSolution = true;
+        noLoop();
         // no solution
     }
     background(0);
@@ -171,12 +196,16 @@ function draw()
     }
 
     // Find best path
-    path = [];
-    var t = current;
-    path.push(t);
-    while (t.previous) {
-        path.push(t.previous);
-        t = t.previous;
+    if(!noSolution)
+    {
+        path = [];
+        var t = current;
+        path.push(t);
+        while (t.previous) 
+        {
+            path.push(t.previous);
+            t = t.previous;
+        }
     }
 
     for (var i = 0; i < path.length; i++)
