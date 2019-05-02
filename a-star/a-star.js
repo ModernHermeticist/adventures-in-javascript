@@ -16,6 +16,12 @@ function heuristic(a, b)
     return d;
 }
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 var rows = 25;
 var cols = 25;
 var grid = new Array(cols);
@@ -109,15 +115,15 @@ function setup()
         }
     }
 
+    //start = grid[getRandomInt(0, rows-1)][getRandomInt(0, rows-1)];
+    //end = grid[getRandomInt(0, rows-1)][getRandomInt(0, rows-1)];
     start = grid[0][0];
-    end = grid[cols-1][rows-1];
+    end = grid[rows-1][cols-1];
     // This is purely for testing
     start.wall = false;
     end.wall = false;
 
     openSet.push(start);
-
-    console.log(grid);
 }
 
 function draw()
@@ -139,6 +145,7 @@ function draw()
         {
             noLoop();
             console.log("DONE");
+            location.reload();
         }
 
         removeFromArray(openSet, current);
@@ -173,6 +180,7 @@ function draw()
         console.log("No solution!");
         noSolution = true;
         noLoop();
+        location.reload();
         // no solution
     }
     background(0);
@@ -212,4 +220,7 @@ function draw()
     {
         path[i].show(color(0, 0, 255));
     }
+
+    start.show(color(255, 192, 203));
+    end.show(color(255, 165, 0));
 }
